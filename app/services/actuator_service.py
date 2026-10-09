@@ -20,6 +20,7 @@ class ActuatorService:
         limit: int = 10,
         ascending: bool = False,
         latest: bool | None = None,
+        name: str | None = None,
     ) -> ActuatorList:
         """# Get Actuators."""
         response = await self.repo.get_all(
@@ -27,6 +28,7 @@ class ActuatorService:
             limit=limit,
             ascending=ascending,
             latest=latest,
+            name=name,
         )
 
         return ActuatorList.model_validate(response)

@@ -57,6 +57,7 @@ class ActuatorRepository:
         limit: int = 10,
         ascending: bool = False,
         latest: bool | None = None,
+        name: str | None = None,
     ) -> dict:
         """It gets all actuators."""
         skip = (page - 1) * limit
@@ -68,6 +69,9 @@ class ActuatorRepository:
 
         if latest is not None:
             filter_dict["latest"] = latest
+
+        if name is not None:
+            filter_dict["name"] = name
 
         cursor = (
             self.collection.find(filter_dict)
