@@ -81,6 +81,17 @@ class ActuatorService:
                 identifier=f"{payload.name} ({payload.version})",
             )
 
+        data = payload.model_dump()
+        data["latest"] = data["set_latest"]
+        del data["set_latest"]
+
+        is_name_exist = self.repo.is_name_exist(
+            actuator_name=payload.name,
+        )
+
+        if is_name_exist is False:
+            data["latest"] = True
+
         doc = await self.repo.create(
             data=payload.model_dump(),
         )

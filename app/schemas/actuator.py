@@ -46,7 +46,13 @@ class ActuatorBase(BaseModel):
 class ActuatorCreate(ActuatorBase):
     """# Actuator Create."""
 
-    pass
+    set_latest: bool = Field(
+        default=False,
+        description=(
+            "It either marks the created actuator latest or not. If there is no active "
+            "actuator for the name then it is set as latest either way."
+        ),
+    )
 
 
 class ActuatorOut(ActuatorBase):

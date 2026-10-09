@@ -215,3 +215,17 @@ class ActuatorRepository:
         )
 
         return count != 0
+
+    async def is_name_exist(
+        self,
+        actuator_name: str,
+    ) -> bool:
+        """It checks that the actuator with that name has already been created."""
+        count = await self.collection.count_documents(
+            {
+                "name": actuator_name,
+                "active": True,
+            },
+        )
+
+        return count > 0
