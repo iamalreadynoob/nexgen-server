@@ -34,19 +34,6 @@ class ActuatorRepository:
             "active": True,
         }
 
-        if data["latest"] is True:
-            await self.collection.update_one(
-                {
-                    "name": data["name"],
-                    "latest": True,
-                },
-                {
-                    "$set": {
-                        "latest": False,
-                    },
-                },
-            )
-
         result = await self.collection.insert_one(doc)
         doc["id"] = result.inserted_id
 
@@ -115,14 +102,16 @@ class ActuatorRepository:
             {
                 "name": actuator_name,
                 "latest": True,
+                "active": True,
             },
         )
 
-    async def set_latest(
+    async def change_latest_info(
         self,
         actuator_id: str,
-    ) -> dict:
-        """It changes the latest actuator."""
+        latest: bool,
+    ) -> dict | None:
+        """It sets the latest flag of the actuator."""
         oid = _oid(actuator_id)
 
         if oid is None:
@@ -135,7 +124,8 @@ class ActuatorRepository:
             },
             {
                 "$set": {
-                    "latest": True,
+                    "latest": latest,
+                    "updated_at": datetime.now(UTC),
                 },
             },
         )

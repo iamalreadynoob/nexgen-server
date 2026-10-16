@@ -3,7 +3,11 @@
 It contains the services for actuators.
 """
 
-from app.core.exceptions import AlreadyExistsError, NotFoundError
+from app.core.exceptions import (
+    AlreadyExistsError,
+    LatestDeletionError,
+    NotFoundError,
+)
 from app.repositories.actuator_repository import ActuatorRepository
 from app.schemas.actuator import ActuatorCreate, ActuatorList, ActuatorOut
 
@@ -87,15 +91,20 @@ class ActuatorService:
         data["latest"] = data["set_latest"]
         del data["set_latest"]
 
-        is_name_exist = self.repo.is_name_exist(
+        is_name_exist = await self.repo.is_name_exist(
             actuator_name=payload.name,
         )
 
         if is_name_exist is False:
             data["latest"] = True
 
+        if data["latest"] is True:
+            await self._clear_latest(
+                actuator_name=payload.name,
+            )
+
         doc = await self.repo.create(
-            data=payload.model_dump(),
+            data=data,
         )
 
         return ActuatorOut.model_validate(doc)
@@ -105,28 +114,29 @@ class ActuatorService:
         actuator_id: str,
     ) -> ActuatorOut:
         """# Set Latest Actuator."""
-        is_id_exists = await self.repo.is_id_exist(
+        actuator = await self.repo.get(
             actuator_id=actuator_id,
         )
 
-        if is_id_exists is False:
+        if actuator is None:
             raise NotFoundError(
                 resource="Actuator",
                 identifier=actuator_id,
             )
 
-        is_already_latest = await self.repo.is_actuator_latest(
-            actuator_id=actuator_id,
-        )
-
-        if is_already_latest is True:
+        if actuator["latest"] is True:
             raise AlreadyExistsError(
                 resource="Actuator",
                 identifier=f"{actuator_id} (latest: True)",
             )
 
-        doc = self.repo.set_latest(
+        await self._clear_latest(
+            actuator_name=actuator["name"],
+        )
+
+        doc = await self.repo.change_latest_info(
             actuator_id=actuator_id,
+            latest=True,
         )
 
         return ActuatorOut.model_validate(doc)
@@ -146,6 +156,36 @@ class ActuatorService:
                 identifier=actuator_id,
             )
 
-        self.repo.delete_actuator(
+        is_latest = await self.repo.is_actuator_latest(
             actuator_id=actuator_id,
+        )
+
+        if is_latest is True:
+            raise LatestDeletionError(
+                resource="Actuator",
+                identifier=actuator_id,
+            )
+
+        await self.repo.delete_actuator(
+            actuator_id=actuator_id,
+        )
+
+    async def _clear_latest(
+        self,
+        actuator_name: str,
+    ) -> None:
+        """# Clear Latest.
+
+        It unmarks the current latest actuator of the name, if there is one.
+        """
+        current_latest = await self.repo.get_latest(
+            actuator_name=actuator_name,
+        )
+
+        if current_latest is None:
+            return
+
+        await self.repo.change_latest_info(
+            actuator_id=str(current_latest["_id"]),
+            latest=False,
         )

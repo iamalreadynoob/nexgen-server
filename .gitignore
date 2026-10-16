@@ -4,3 +4,8 @@ __pycache__/
 .ruff_cache
 
 .env
+.pytest_cache/
+.coverage
+coverage.xml
+junit.xml
+htmlcov/
