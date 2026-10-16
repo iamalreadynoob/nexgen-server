@@ -31,6 +31,7 @@ class ActuatorRepository:
             **data,
             "created_at": process_time,
             "updated_at": process_time,
+            "active": True,
         }
 
         if data["latest"] is True:

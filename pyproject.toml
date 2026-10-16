@@ -18,7 +18,15 @@ dependencies = [
 [tool.ruff]
 line-length = 88
 indent-width = 4
-exclude = ["__init__.py", ".env", ".gitignore", "requirements.txt", "uv.lock"]
+exclude = [
+    "__init__.py",
+    ".env",
+    ".gitignore",
+    "requirements.txt",
+    "uv.lock",
+    ".claude/skills",  # vendored third-party skills
+]
+force-exclude = true
 
 [tool.ruff.lint]
 select = [
