@@ -25,6 +25,15 @@ class AlreadyExistsError(Exception):
         super().__init__(f"{resource} '{identifier}' already exists")
 
 
+class InvalidFormatError(Exception):
+    """It is raised once the given value does not have the expected format."""
+
+    def __init__(self, field: str, expected: str):
+        self.field = field
+        self.expected = expected
+        super().__init__(f"{field} must be {expected}")
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """# Register Exception Handlers."""
 
@@ -40,3 +49,11 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """# Not Found Handler."""
         return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+    @app.exception_handler(InvalidFormatError)
+    async def invalid_format_handler(
+        _: Request,
+        exc: InvalidFormatError,
+    ) -> JSONResponse:
+        """# Invalid Format Handler."""
+        return JSONResponse(status_code=422, content={"detail": str(exc)})

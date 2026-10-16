@@ -24,7 +24,7 @@ def _oid(value: str) -> ObjectId | None:
 
 
 class DataRepository:
-    """# Actuator Repository."""
+    """# Data Repository."""
 
     def __init__(self, db: AsyncDatabase):
         self.collection: AsyncCollection = db["data"]
@@ -217,7 +217,7 @@ class DataRepository:
         logger.info("Updated data %s", doc["id"])
         return doc
 
-    async def delete_actuator(
+    async def delete_data(
         self,
         data_id: str,
     ) -> None:
@@ -241,10 +241,10 @@ class DataRepository:
 
     async def is_id_exist(
         self,
-        actuator_id: str,
+        data_id: str,
     ) -> bool:
         """It checks that ID exists or not."""
-        oid = _oid(actuator_id)
+        oid = _oid(data_id)
 
         if oid is None:
             return False

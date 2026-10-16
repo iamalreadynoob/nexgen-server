@@ -5,8 +5,10 @@ from pymongo.asynchronous.database import AsyncDatabase
 
 from app.db.mongo import get_database
 from app.repositories.actuator_repository import ActuatorRepository
+from app.repositories.content_repository import ContentRepository
 from app.repositories.data_repository import DataRepository
 from app.services.actuator_service import ActuatorService
+from app.services.content_service import ContentService
 from app.services.data_service import DataService
 
 
@@ -24,4 +26,13 @@ def get_data_service(
     return DataService(
         repo=DataRepository(db),
         actuator_repo=ActuatorRepository(db),
+    )
+
+
+def get_content_service(
+    db: AsyncDatabase = Depends(get_database),
+) -> ContentService:
+    """# Get Content Service."""
+    return ContentService(
+        repo=ContentRepository(db),
     )

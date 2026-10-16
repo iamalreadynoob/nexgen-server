@@ -47,16 +47,20 @@ class DataService:
         metadata_only: bool = False,
     ) -> DataOut:
         """# Get Data."""
-        doc = await self.repo.get(
+        is_id_exists = await self.repo.is_id_exist(
             data_id=data_id,
-            metadata_only=metadata_only,
         )
 
-        if doc is None:
+        if is_id_exists is False:
             raise NotFoundError(
                 resource="Data",
                 identifier=data_id,
             )
+
+        doc = await self.repo.get(
+            data_id=data_id,
+            metadata_only=metadata_only,
+        )
 
         return DataOut.model_validate(doc)
 
@@ -126,6 +130,6 @@ class DataService:
                 identifier=data_id,
             )
 
-        self.repo.delete_actuator(
+        self.repo.delete_data(
             data_id=data_id,
         )
