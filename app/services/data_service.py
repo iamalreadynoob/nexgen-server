@@ -8,7 +8,13 @@ import logging
 from app.core.exceptions import NotFoundError
 from app.repositories.actuator_repository import ActuatorRepository
 from app.repositories.data_repository import DataRepository
-from app.schemas.data import DataCreate, DataList, DataOut, DataUpdate
+from app.schemas.data import (
+    DataCreate,
+    DataList,
+    DataMetadataOut,
+    DataOut,
+    DataUpdate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +51,7 @@ class DataService:
         self,
         data_id: str,
         metadata_only: bool = False,
-    ) -> DataOut:
+    ) -> DataOut | DataMetadataOut:
         """# Get Data."""
         is_id_exists = await self.repo.is_id_exist(
             data_id=data_id,
@@ -61,6 +67,9 @@ class DataService:
             data_id=data_id,
             metadata_only=metadata_only,
         )
+
+        if metadata_only is True:
+            return DataMetadataOut.model_validate(doc)
 
         return DataOut.model_validate(doc)
 
@@ -107,7 +116,7 @@ class DataService:
                 identifier=data_id,
             )
 
-        doc = self.repo.update(
+        doc = await self.repo.update(
             data_id=data_id,
             linked_resource=payload.linked_resource,
             specs=payload.specs,
@@ -130,6 +139,6 @@ class DataService:
                 identifier=data_id,
             )
 
-        self.repo.delete_data(
+        await self.repo.delete_data(
             data_id=data_id,
         )

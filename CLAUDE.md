@@ -30,10 +30,10 @@ Swagger UI is at `/docs` unless `ENVIRONMENT=production`.
 ## Tests
 
 `tests/` mirrors `app/` under `unit/` (later `integration/`). Test deps are in the uv `dev` group, never in `requirements.txt`. Starlette's `TestClient` needs `httpx2`, not `httpx`; `filterwarnings = error` turns the deprecation into a failure.
-- `tests/conftest.py`: `settings` (built with `_env_file=None`, so `.env` is ignored), `app` (fresh `create_app()` per test, overrides cleared after), `client` (sends `X-API-Key`), `anon_client`, and `actuator_factory`.
+- `tests/conftest.py`: `settings` (built with `_env_file=None`, so `.env` is ignored), `app` (fresh `create_app()` per test, overrides cleared after), `client` (sends `X-API-Key`), `anon_client`, `actuator_factory`, and `data_factory`.
 - The `TestClient` is never entered as a context manager, so the lifespan (the Mongo client and file logging) does not run.
 - Endpoint tests replace the service with `create_autospec(Service, instance=True)` through `app.dependency_overrides[get_<x>_service]`, then assert status codes, response JSON and `assert_awaited_once_with(...)`. Responses render with aliases, so `ActuatorOut` comes back as `_id`, not `id`.
-- `.github/workflows/ci.yml` runs ruff (check and format) and pytest on every push and on PRs to `main`.
+- `.github/workflows/ci.yml` runs ruff (check and format) and pytest on every push and on PRs to `main`. The `test` job is a matrix with one job per suite (`actuators`, `data`), each running the files in its `paths`; a new test module must be added to a suite's `paths`, or CI will not run it.
 
 ## Configuration
 

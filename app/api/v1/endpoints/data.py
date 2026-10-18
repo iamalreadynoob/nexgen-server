@@ -6,7 +6,13 @@ Data endpoints are placed in here.
 from fastapi import APIRouter, Depends, status
 
 from app.api.deps import get_data_service
-from app.schemas.data import DataCreate, DataList, DataOut, DataUpdate
+from app.schemas.data import (
+    DataCreate,
+    DataList,
+    DataMetadataOut,
+    DataOut,
+    DataUpdate,
+)
 from app.services.data_service import DataService
 
 router = APIRouter(prefix="/data", tags=["data"])
@@ -36,9 +42,12 @@ async def get_data_list(  # noqa: ANN201
 
 @router.get(
     "/{data_id}",
-    response_model=DataOut,
+    response_model=DataOut | DataMetadataOut,
     status_code=status.HTTP_200_OK,
-    description="It gets the requested data item.",
+    description=(
+        "It gets the requested data item. With `metadata_only`, only `id`, "
+        "`actuator_id` and `metadata` are returned."
+    ),
 )
 async def get_data(  # noqa: ANN201
     data_id: str,

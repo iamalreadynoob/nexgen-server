@@ -37,9 +37,19 @@ jobs:
       - name: Ruff format
         run: uv run ruff format --check .
 
+  # One job per suite, so each one shows up as its own check on the push/PR.
+  # New test modules must be added to the `paths` of a suite (or a new suite).
   test:
-    name: Test
+    name: Test (${{ matrix.suite }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: actuators
+            paths: tests/unit/api/v1/test_actuators.py
+          - suite: data
+            paths: tests/unit/api/v1/test_data.py
     steps:
       - uses: actions/checkout@v7
 
@@ -52,11 +62,13 @@ jobs:
         run: uv sync --locked
 
       - name: Run tests
-        run: uv run pytest --cov --cov-report=term-missing --junitxml=junit.xml
+        run: >-
+          uv run pytest ${{ matrix.paths }}
+          --cov --cov-report=term-missing --junitxml=junit.xml
 
       - name: Upload test results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: junit-results
+          name: junit-${{ matrix.suite }}
           path: junit.xml

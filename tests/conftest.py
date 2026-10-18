@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from app.core.config import Settings, get_settings
 from app.main import create_app
 from app.schemas.actuator import ActuatorOut
+from app.schemas.data import DataOut
 
 TEST_API_KEY = "test-api-key"
 FIXED_NOW = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
@@ -70,5 +71,25 @@ def actuator_factory() -> Callable[..., ActuatorOut]:
             **overrides,
         }
         return ActuatorOut.model_validate(data)
+
+    return _make
+
+
+@pytest.fixture
+def data_factory() -> Callable[..., DataOut]:
+    """Build a valid `DataOut`; keyword arguments override single fields."""
+
+    def _make(**overrides: Any) -> DataOut:
+        data = {
+            "id": "65f0c0ffee000000000da7a0",
+            "actuator_id": "65f0c0ffee0000000000abcd",
+            "metadata": {"bits": [1, 0, 1, 1]},
+            "linked_resource": "input-001",
+            "specs": {"rate": 0.5},
+            "created_at": FIXED_NOW,
+            "updated_at": FIXED_NOW,
+            **overrides,
+        }
+        return DataOut.model_validate(data)
 
     return _make

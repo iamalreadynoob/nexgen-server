@@ -49,6 +49,23 @@ class DataOut(DataBase):
     )
 
 
+class DataMetadataOut(BaseModel):
+    """# Data Metadata Out.
+
+    It is returned instead of `DataOut` when only the metadata is requested.
+    """
+
+    id: str = Field(
+        description="Data ID information",
+    )
+    actuator_id: str = Field(
+        description="Used actuator for the data.",
+    )
+    metadata: object = Field(
+        description="The output created with actuator.",
+    )
+
+
 class DataUpdate(BaseModel):
     """# Data Update."""
 
