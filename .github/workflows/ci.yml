@@ -50,6 +50,8 @@ jobs:
             paths: tests/unit/api/v1/test_actuators.py
           - suite: data
             paths: tests/unit/api/v1/test_data.py
+          - suite: contents
+            paths: tests/unit/api/v1/test_contents.py
     steps:
       - uses: actions/checkout@v7
 

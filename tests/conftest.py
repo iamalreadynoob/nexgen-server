@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from app.core.config import Settings, get_settings
 from app.main import create_app
 from app.schemas.actuator import ActuatorOut
+from app.schemas.contents import ContentOut
 from app.schemas.data import DataOut
 
 TEST_API_KEY = "test-api-key"
@@ -91,5 +92,23 @@ def data_factory() -> Callable[..., DataOut]:
             **overrides,
         }
         return DataOut.model_validate(data)
+
+    return _make
+
+
+@pytest.fixture
+def content_factory() -> Callable[..., ContentOut]:
+    """Build a valid `ContentOut`; keyword arguments override single fields."""
+
+    def _make(**overrides: Any) -> ContentOut:
+        data = {
+            "id": "65f0c0ffee00000000c0ffee",
+            "identifier": "input-001",
+            "specs": {"color": "red", "size": 5},
+            "created_at": FIXED_NOW,
+            "updated_at": FIXED_NOW,
+            **overrides,
+        }
+        return ContentOut.model_validate(data)
 
     return _make
