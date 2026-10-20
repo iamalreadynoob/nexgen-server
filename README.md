@@ -57,6 +57,8 @@ Nexgen Server supports two objectives:
 
 The server stores actuators and records. It does not run actuator code. The applications that call the API run the actuators.
 
+To connect a Python application to the API, use the [**nexgenpy**](https://github.com/iamalreadynoob/nexgen) module. It is designed for the Nexgen Server REST API.
+
 ## Setup
 
 ### Requirements
