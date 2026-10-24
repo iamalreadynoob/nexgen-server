@@ -8,14 +8,15 @@
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)](docker-compose.yaml)
+[![Docker Hub](https://img.shields.io/badge/docker%20hub-nexgensemantics%2Fnexgen-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/nexgensemantics/nexgen)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 <p>
   <a href="#introduction">Introduction</a> •
   <a href="#setup">Setup</a> •
   <a href="#basic-concepts">Basic concepts</a> •
-  <a href="#documentation">Documentation</a>
+  <a href="#documentation">Documentation</a> •
+  <a href="#contact">Contact</a>
 </p>
 
 </div>
@@ -67,9 +68,48 @@ To connect a Python application to the API, use the [**nexgenpy**](https://githu
 ### Requirements
 
 - Docker and Docker Compose, **or** Python 3.12 with [uv](https://github.com/astral-sh/uv) and a MongoDB server
-- Git
+- Git (only to build from source or to run locally)
 
-### Run with Docker Compose
+There are two ways to run Nexgen Server with Docker Compose:
+
+| Option | Compose file | Use it when |
+|---|---|---|
+| [Use the Docker Hub image](#option-1-use-the-docker-hub-image) | `docker-compose.yaml` | You want to run the server. You do not need the source code. |
+| [Build from source](#option-2-build-from-source) | `docker-compose-dev.yaml` | You want to change the code, or run an unreleased version. |
+
+The two options start the same services: the API and MongoDB 7. Both read the same `.env` file.
+
+### Option 1: Use the Docker Hub image
+
+The image is [`nexgensemantics/nexgen`](https://hub.docker.com/r/nexgensemantics/nexgen) on Docker Hub.
+
+1. Make a directory and download the Compose file and the environment template:
+
+   ```bash
+   mkdir nexgen-server && cd nexgen-server
+   curl -O https://raw.githubusercontent.com/iamalreadynoob/nexgen-server/main/docker-compose.yaml
+   curl -o .env https://raw.githubusercontent.com/iamalreadynoob/nexgen-server/main/.env.example
+   ```
+
+2. Set `MONGO_ROOT_USERNAME` and `MONGO_ROOT_PASSWORD` in `.env`.
+3. Set `API_KEY` in `.env`. If you do not set a key, the API is open to all callers.
+4. Pull the image and start the API and MongoDB:
+
+   ```bash
+   docker compose pull
+   docker compose up -d
+   ```
+
+5. Check the service:
+
+   ```bash
+   curl http://localhost:8000/api/v1/health
+   # {"status":"ok"}
+   ```
+
+To update to the latest image, run `docker compose pull` and `docker compose up -d` again. The MongoDB data stays in the `nexgen_mongo_data` volume.
+
+### Option 2: Build from source
 
 1. Clone the repository:
 
@@ -81,35 +121,33 @@ To connect a Python application to the API, use the [**nexgenpy**](https://githu
 2. Copy the environment template:
 
    ```bash
-   cp .env.tmp .env
+   cp .env.example .env
    ```
 
-3. Set `MONGO_ROOT_USERNAME` and `MONGO_ROOT_PASSWORD` in `.env`.
-4. Set `API_KEY` in `.env`. If you do not set a key, the API is open to all callers.
-5. Start the API and MongoDB:
+3. Set `MONGO_ROOT_USERNAME`, `MONGO_ROOT_PASSWORD` and `API_KEY` in `.env`, as in Option 1.
+4. Build the image and start the API and MongoDB:
 
    ```bash
-   docker compose up --build
+   docker compose -f docker-compose-dev.yaml up --build
    ```
 
-6. Check the service:
+5. Check the service with the same `curl` command as in Option 1.
 
-   ```bash
-   curl http://localhost:8000/api/v1/health
-   # {"status":"ok"}
-   ```
+### Notes for both options
 
-Docker Compose makes `MONGODB_URI` from the MongoDB user name and password. The API listens on port 8000. To use a different port, set `API_PORT` in `.env`.
+- Docker Compose makes `MONGODB_URI` from the MongoDB user name and password. You do not set it in `.env`.
+- The API listens on port 8000. To use a different port, set `API_PORT` in `.env`.
+- To stop the services, run `docker compose down` (add `-f docker-compose-dev.yaml` for Option 2). To also delete the MongoDB data, add `-v`.
 
 ### Run locally with uv
 
-1. Install the dependencies:
+1. Clone the repository, then install the dependencies:
 
    ```bash
    uv sync
    ```
 
-2. Copy `.env.tmp` to `.env`.
+2. Copy `.env.example` to `.env`.
 3. Add `MONGODB_URI` to `.env` if MongoDB is not at `mongodb://localhost:27017`.
 4. Start the development server:
 
@@ -197,3 +235,9 @@ A content item stores an `identifier` for an original input and free-form `specs
 | [Security](docs/security.md) | API security, risks of stored actuator code, and SemCom threats |
 | [Glossary](docs/glossary.md) | SemCom and project terms |
 | [References](docs/references.md) | Surveys and papers about SemCom |
+
+## Contact
+
+Do you have a question, an idea or a problem? Send an email to [dev.nexgen.semantics@gmail.com](mailto:dev.nexgen.semantics@gmail.com).
+
+To report a bug or to request a feature, you can also [open an issue](https://github.com/iamalreadynoob/nexgen-server/issues).

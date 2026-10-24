@@ -1,8 +1,6 @@
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nexgensemantics/nexgen:latest
     container_name: nexgen-server
     env_file:
       - .env
