@@ -63,6 +63,9 @@ To connect a Python application to the API, use the [**nexgenpy**](https://githu
 > [!TIP]
 > Do you use [Claude Code](https://claude.com/claude-code)? The [nexgen api skill](https://github.com/iamalreadynoob/nexgen-server-skill) gives Claude Code the knowledge to use `nexgenpy` in your projects. Install it to get help when you register, load and use actuators.
 
+> [!TIP]
+> You can find the example usecase scenario for Nexgen inside the [nexgen example](https://github.com/iamalreadynoob/nexgen-example)
+
 ## Setup
 
 ### Requirements
